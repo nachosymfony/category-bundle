@@ -1,0 +1,22 @@
+<?php
+
+namespace nacholibre\CategoryBundle\Entity;
+
+use nacholibre\CategoryBundle\Model\Category as CategoryModel;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
+/**
+ * @ORM\Entity(repositoryClass="nacholibre\CategoryBundle\Repository\CategoryRepository")
+ * @UniqueEntity(fields={"name"}, errorPath="name", message="category.name.duplicate")
+ * @UniqueEntity(fields={"parent"}, errorPath="name", message="category.name.duplicate")
+ * @UniqueEntity(fields={"type"}, errorPath="name", message="category.name.duplicate")
+ * @ORM\Table(name="nacholibre_category",uniqueConstraints={
+ *     @ORM\UniqueConstraint(name="name", columns={"slug", "parent_id", "type"})},
+ *     indexes={@ORM\Index(name="position", columns={"position"})})
+ */
+class Category extends CategoryModel {
+    public function __construct() {
+        parent::__construct();
+    }
+}

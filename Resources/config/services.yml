@@ -1,4 +1,10 @@
 services:
-#    nacholibre_category.example:
-#        class: nacholibre\CategoryBundle\Example
-#        arguments: ["@service_id", "plain_value", %parameter%]
+    nacholibre.category.manager:
+        class: nacholibre\CategoryBundle\Model\CategoryManager
+        arguments: [@service_container, @doctrine.orm.entity_manager]
+
+    nacholibre.base_category.form.type:
+        class: nacholibre\CategoryBundle\Form\BaseCategoryType
+        arguments: [@service_container]
+        tags:
+            - { name: form.type }

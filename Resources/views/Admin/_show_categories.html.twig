@@ -1,0 +1,54 @@
+{% import 'nacholibreAdminBundle::macros.html.twig' as macros %}
+
+{#
+<a href="{{ path('nacholibre.category.admin.new') }}" class='btn btn-primary btn-lg'>{{ 'Create' | trans }}</a>
+<hr>
+#}
+<div class='row'>
+    <div class="col-lg-6 col-md-6">
+        <div class="panel panel-default">
+            {#
+            <div class="panel-heading">Категории</div>
+            #}
+            <div class="panel-body">
+                <button class='btn btn-default btn-primary' type='button' id='create_category'>{{ 'Create' | trans }}</button>
+                {#
+                <button class='btn btn-default btn-primary' type='button' id='edit_category' disabled>{{ 'Edit' | trans }}</button>
+                #}
+                <hr>
+                <div id="jstree_category_tree">
+                    <ul>
+                        {% for name, data in hierarchy %}
+                        <li data-jstree='{ "type" : "folder", "category_id": {{ data.category.id }} }'>
+                            {{ name }}
+                            {% if data.children | length > 0 %}
+                            <ul>
+                            {% for name, data in data.children %}
+                            <li data-jstree='{ "type" : "folder", "category_id": {{ data.category.id }} }'>
+                                {{ name }}
+                                {% if data.children | length > 0 %}
+                                    <ul>
+                                        {% for name, data in data.children %}
+                                        <li data-jstree='{ "type" : "folder", "category_id": {{ data.category.id }} }'>{{ name }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 col-md-6" >
+        <div class="panel panel-default" id='edit_panel'>
+            <div class="panel-heading">{{ 'category.edit' | trans }}</div>
+            <div class="panel-body" id='edit_form_html'>
+            </div>
+        </div>
+    </div>
+</div>

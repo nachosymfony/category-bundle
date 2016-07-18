@@ -20,9 +20,40 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('nacholibre_category');
 
-        // Here you should define the parameters that are allowed to
-        // configure your bundle. See the documentation linked above for
-        // more information on that topic.
+        $rootNode
+            ->children()
+                ->arrayNode('types')
+                    ->isRequired()
+                    ->prototype('array')
+                        ->children()
+                            ->integerNode('max_levels')
+                                ->info('Max category levels for the category type.')
+                                ->min(1)
+                                ->max(3)
+                                ->defaultValue(1)
+                            ->end()
+                            ->scalarNode('entity_class')
+                                ->info('Category entity class for this type. Example: AppBundle\Entity\Category')
+                                ->isRequired()
+                                ->cannotBeEmpty()
+                            ->end()
+                            ->scalarNode('form_class')
+                                ->info('Form class used when displaying category in admin. Example: AppBundle\Form\ProductCategoryType')
+                                ->defaultValue('')
+                            ->end()
+                            ->enumNode('url_type')
+                                ->info('What type of urls to be used when listing category members.')
+                                ->values(['slug', 'id', 'slug_id'])
+                                ->defaultValue('slug')
+                            ->end()
+                            ->scalarNode('url_prefix')
+                                ->info('The prefix used when listing category members.')
+                                ->defaultValue('')
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
 
         return $treeBuilder;
     }

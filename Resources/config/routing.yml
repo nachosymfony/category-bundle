@@ -1,3 +1,3 @@
-nacholibre_category_homepage:
-    path:     /
-    defaults: { _controller: nacholibreCategoryBundle:Default:index }
+#nacholibre_category_homepage:
+#    path:     /
+#    defaults: { _controller: nacholibreCategoryBundle:Default:index }
