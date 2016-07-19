@@ -24,9 +24,12 @@ class CategoryController extends Controller {
 
         $hierarchy = $categoryManager->getCategoryHierarchy($type);
 
+        $typeConfig = $categoryManager->getTypeConfig($type);
+
         return $this->render('nacholibreCategoryBundle:Admin:index.html.twig', [
             'hierarchy' => $hierarchy,
             'type' => $type,
+            'max_levels' => $typeConfig['max_levels'],
             //'allowAdd' => $allowAdd,
         ]);
     }

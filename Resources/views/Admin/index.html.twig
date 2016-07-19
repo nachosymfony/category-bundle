@@ -113,7 +113,7 @@
                 "types" : {
                     "#" : {
                         "max_children" : 200,
-                        "max_depth" : 3,
+                        "max_depth" : {{ max_levels }},
                         "valid_children" : ["folder"]
                     },
                     //"root" : {
@@ -121,12 +121,12 @@
                     //    "valid_children" : ["folder"]
                     //},
                     "folder" : {
-                        "icon" : "fa fa-folder",
+                        "icon" : "{{ asset('bundles/nacholibrecategory/img/folder.png') }}",
                         "valid_children" : ["folder"]
                     }
                 },
                 "plugins" : [
-                    "contextmenu", "dnd", "search",
+                    "dnd", "search",
                     "state", "types", "wholerow", "unique"
                 ],
             });
