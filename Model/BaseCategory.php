@@ -36,12 +36,13 @@ class BaseCategory {
     protected $children;
 
     /**
+     * @Gedmo\SortablePosition
      * @ORM\Column(type="integer", nullable=true)
-     * @Gedmo\Sortable(groups={"parent"})
      */
     protected $position;
 
     /**
+     * @Gedmo\SortableGroup
      * @ORM\ManyToOne(targetEntity="Category", inversedBy="children")
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
      */
