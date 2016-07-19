@@ -47,7 +47,7 @@
                     }
 
                     nacholibre_admin.startLoading();
-                    $.get(Routing.generate('nacholibre.category.admin.change_position', { id: categoryID, "position": position }), function(data) {
+                    $.get(Routing.generate('nacholibre.category.admin.change_position', { id: categoryID, "position": position, "type": '{{ app.request.attributes.get('_route_params')['type'] }}' }), function(data) {
                         nacholibre_admin.stopLoading();
                     });
                 } else {
