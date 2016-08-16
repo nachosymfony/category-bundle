@@ -12,13 +12,13 @@ use Symfony\Component\DependencyInjection\Loader;
  *
  * @link http://symfony.com/doc/current/cookbook/bundles/extension.html
  */
-class nacholibreCategoryExtension extends Extension
-{
+class nacholibreCategoryExtension extends Extension {
+    protected $formTypeTemplate = 'nacholibreCategoryBundle::fields.html.twig';
+
     /**
      * {@inheritdoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
-    {
+    public function load(array $configs, ContainerBuilder $container) {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
@@ -26,5 +26,22 @@ class nacholibreCategoryExtension extends Extension
         $loader->load('services.yml');
 
         $container->setParameter('nacholibre_category', $config);
+    }
+
+    public function prepend(ContainerBuilder $container) {
+        $this->configureTwigBundle($container);
+    }
+
+    protected function configureTwigBundle(ContainerBuilder $container) {
+        foreach (array_keys($container->getExtensions()) as $name) {
+            switch ($name) {
+                case 'twig':
+                    $container->prependExtensionConfig(
+                        $name,
+                        array('form' => array('resources' => array($this->formTypeTemplate)))
+                    );
+                    break;
+            }
+        }
     }
 }
