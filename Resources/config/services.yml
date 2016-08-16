@@ -8,3 +8,9 @@ services:
         arguments: [@service_container]
         tags:
             - { name: form.type }
+
+    nacholibre.category.form.type:
+        class: nacholibre\CategoryBundle\Form\Type\CategorySelectorType
+        arguments: ["@doctrine.orm.entity_manager", "@service_container"]
+        tags:
+            - { name: form.type }

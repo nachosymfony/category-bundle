@@ -1,5 +1,4 @@
-{#
-{% block rich_image_errors %}
+{% block nacholibre_category_type_errors %}
     {% if errors | length > 0 -%}
     <div class="alert alert-danger">
         <ul class="list-unstyled">
@@ -10,69 +9,290 @@
     </div>
     {%- endif %}
 {% endblock %}
-#}
 
 {% block nacholibre_category_type_widget %}
-asd
-{#
-    <div class='form-group'>
-        <label class="control-label" for="product_images">
-            {% if form.vars.label %}
-            {{ form.vars.label }}
-            {% else %}
-            {{ form.vars.name | capitalize }}
-            {% endif %}
-        </label>
-
-        {% include 'nacholibreRichUploaderBundle::styles.html.twig' %}
-
-        {% set multiple = form.vars.nacholibre_multiple %}
-        {% set size = form.vars.nacholibre_size %}
-        {% set entity_class = form.vars.nacholibre_entity_class %}
-        {% set configName = form.vars.nacholibre_config_name %}
-
-        <div class='main_sortable_images nacholibre_{{ form.vars.name }} size-{{ size }}' data-multiple='{{ multiple }}' data-entity='{{ entity_class }}'>
-            {{ form_errors(form) }}
-
-            <div class="uploadErrors alert alert-warning hidden" role="alert">
-            </div>
-
-            <div class='nacholibre_ids'>
-                {{ block('hidden_widget') }}
-            </div>
-
-            <div id="sortable" data-name='{{ form.vars.name }}' class='{{ form.vars.name }}'>
-                {% include 'nacholibreRichUploaderBundle::show_image.html.twig' with {images: form.vars.images_data, multiple: multiple, uploadErrors: [], filesWithErrors: 0, configName: configName} %}
-            </div>
-            <div class='rich_image_thumb upload'>
-                <input type="file" name="images" class='imageUploader' id='image_uploader' accept="{{ form.vars.nacholibre_mime_types | join(', ') }}" {% if multiple %}multiple{% endif %}>
-                <div class='selectImages text-center'>
-                    {% if multiple %}
-                        <span class='addI'>+</span>
-                        <div class='slog'>
-                        {{ 'add_files' | trans }}
-                        </div>
-                    {% else %}
-                        <img src='{{ asset('bundles/nacholibrerichuploader/img/upload.png') }}' class='uploadImg' />
-                        <div class='slog'>
-                        {{ 'add_file' | trans }}
+<div class='row'>
+    <div class='col-md-12'>
+        <div class="form-group">
+            <label class="control-label" for="product_images">
+                {% if form.vars.label %}
+                {{ form.vars.label }}
+                {% else %}
+                {{ form.vars.name | capitalize }}
+                {% endif %}
+            </label>
+            <div class='nacholibre_category_selector'>
+                <div class="input-group">
+                    <input type="text" id='categories_search' maxlength="255" class="form-control" placeholder='Започни да пишеш за да избереш категория' autocomplete="off">
+                    <div class="input-group-btn">
+                        <button class='btn btn-success'>Добави нова</button>
                     </div>
-                    {% endif %}
                 </div>
-            </div>
-            <div class='message_visible'>
-                <div>
-                    <span>!</span> {{ 'max_size' | trans }}: <b>{{ form.vars.nacholibre_max_size }}</b> | {{ 'allowed_file_types' | trans }}: <b>{{ form.vars.nacholibre_mime_types | join(', ') }}</b>
-                </div>
-            </div>
-            <div class='message'>
-                <div>
-                    <span>!</span> {{ 'changes_after_save' | trans }}
+                <div class='categories'>
+                    {{ block('hidden_widget') }}
+                    <div class='chosed'>
+                    </div>
+                    <ul class='cc'>
+                        {% for catData in categories %}
+                        <li>
+                        <span class='categoryName' data-id='{{ catData.category.id }}'>{{ catData.category.getName() }}</span>
+                            {% if catData.children | length %}
+                            <ul>
+                                {% for subData in catData.children %}
+                                <li>
+                                    <span class='categoryName' data-id='{{ subData.category.id }}'>{{ subData.category.getName() }}</span>
+                                    {% if subData.children | length %}
+                                    <ul>
+                                        {% for subData in subData.children %}
+                                        <li><span class='categoryName' data-id='{{ subData.category.id }}'>{{ subData.category.getName() }}</span></li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% endif %}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+
+                    </ul>
                 </div>
             </div>
         </div>
+        {#
+        <button class='btn btn-default btn-info'>Избери категории</button>
+        #}
     </div>
+</div>
 
-    {% include 'nacholibreRichUploaderBundle::scripts.html.twig' with {name: form.vars.name} %}
-    #}
+<style>
+    .nacholibre_category_selector .cc {
+        //display:none;
+    }
+
+    .nacholibre_category_selector .categories .chosed div {
+        padding: 3px;
+        border-radius: 4px;
+        border: 1px solid #a7cedb;
+        background: #E5FFD9;
+        margin:5px;
+        margin-left:0;
+        display:inline-block;
+        cursor:default;
+    }
+
+    .nacholibre_category_selector ul {
+        list-style-type:none;
+        margin:0;
+        padding:0;
+        margin-left:5px;
+    }
+
+    .nacholibre_category_selector ul li {
+        line-height:25px;
+    }
+
+    .nacholibre_category_selector li > .categoryName {
+        padding:3px;
+        border-radius:4px;
+        border:1px solid #f5f5f5;
+    }
+
+    .nacholibre_category_selector li > .categoryName.selected {
+        border: 1px solid #a7cedb;
+        background: #E5FFD9;
+    }
+
+    .nacholibre_category_selector li > .categoryName.selected:hover {
+        border: 1px solid #a7cedb;
+        background: #E5FFD9;
+    }
+
+    .nacholibre_category_selector li > .categoryName:hover {
+        cursor:pointer;
+        background: #cdecf6;
+        border: 1px solid #a7cedb;
+    }
+
+    .nacholibre_category_selector ul li > ul {
+        margin-left:15px;
+    }
+
+    .nacholibre_category_selector {
+        background-color:#f5f5f5;
+        padding:7px;
+        border-radius:6px;
+        border:1px solid #ccc;
+    }
+
+    .collapseExpandHolder {
+        width:17px;
+        height:17px;
+        display:block;
+        float:left;
+        text-align:center;
+        cursor:pointer;
+        font-size:16px;
+        font-weight:bold;
+        line-height:20px;
+        color:green;
+    }
+</style>
+
+<script>
+    $(function() {
+        var inputSelector = $('.nacholibre_category_selector input');
+
+        var categoryInput = $('.nacholibre_category_selector .categories input');
+
+        //inputSelector.on('focusin', function() {
+        //    $(this).parent().find('.cc').slideToggle();
+        //});
+
+        //inputSelector.on('focusout', function() {
+        //    $(this).parent().find('.cc').slideToggle();
+        //});
+
+        function highlightSelectedCategories() {
+            if (categoryInput.attr('value')) {
+                var ids = categoryInput.attr('value').split(',');
+
+                var catSelector = $('.nacholibre_category_selector .categories');
+
+                for (var i = 0; i < ids.length; i++) {
+                    var id = ids[i];
+                    var category = catSelector.find('.categoryName[data-id="'+id+'"]');
+
+                    addCategoryToChosedList(category);
+
+                    category.addClass('selected');
+                }
+            }
+        }
+
+        function travCategories() {
+            var root = $('.nacholibre_category_selector ul.cc > li');
+
+            root.each(function() {
+                var categoryName = $(this).find('> .categoryName').text().trim();
+                $(this).find('> .categoryName').attr('data-path', categoryName);
+
+                var cname = categoryName;
+
+                $(this).find('> ul > li').each(function() {
+                    var categoryName = cname + ' > ' + $(this).find('> .categoryName').text().trim();
+                    $(this).find('> .categoryName').attr('data-path', categoryName);
+
+                    var cname2 = $(this).find('> .categoryName').text().trim();
+
+                    $(this).find('> ul li').each(function() {
+                        var categoryName = cname + ' > ' + cname2 + ' > ' + $(this).find('> .categoryName').text().trim();
+                        $(this).find('> .categoryName').attr('data-path', categoryName);
+                    });
+                });
+            });
+        }
+
+        travCategories();
+
+        highlightSelectedCategories();
+
+        $('.nacholibre_category_selector ul li').each(function(index) {
+            var children = $(this).find('ul');
+            children.hide();
+
+            if (children.length) {
+                var plusButton = $('<span class="collapseExpandHolder sel_del">+</span>');
+                $(this).prepend(plusButton);
+
+                plusButton.on('click', function() {
+                    $(this).parent().find('> ul').slideToggle();
+
+                    var plusButtonText = $(this).text();
+
+                    if (plusButtonText == '+') {
+                        $(this).text('-');
+                    } else {
+                        $(this).text('+');
+                    }
+                });
+
+                //children.each(function() {
+                //    console.log('here');
+                //    $(this).attr('parent-name', $(this).text().trim());
+                //});
+            } else {
+                var plusButton = $('<span class="collapseExpandHolder"></span>');
+                $(this).prepend(plusButton);
+            }
+
+            //console.log(index);
+        });
+
+        function addCategoryID(id) {
+            var ids = categoryInput.val();
+
+            if (ids) {
+                var realIds = ids.split(',');
+            } else {
+                var realIds = [];
+            }
+
+            realIds.push(id);
+            categoryInput.attr('value', realIds.join(','));
+        }
+
+        function removeCategoryID(id) {
+            var ids = categoryInput.val();
+
+            if (ids) {
+                var realIds = ids.split(',');
+            } else {
+                var realIds = [];
+            }
+
+            var d = realIds.splice(realIds.indexOf(id), 1);
+
+            categoryInput.attr('value', realIds.join(','));
+        }
+
+        function addCategoryToChosedList(catElement) {
+            var dataPath = catElement.attr('data-path');
+            var selectedCategoryElement = $('<div data-path="'+dataPath+'">'+dataPath+'</div>');
+
+            $('.nacholibre_category_selector .categories > .chosed').append(selectedCategoryElement);
+
+            var categoryID = catElement.attr('data-id');
+        }
+
+        function addCategory(catElement) {
+            addCategoryToChosedList(catElement);
+            var categoryID = catElement.attr('data-id');
+
+            addCategoryID(categoryID);
+        }
+
+        function removeCategory(catElement) {
+            var path = catElement.attr('data-path')
+
+            $('.nacholibre_category_selector .categories > .chosed div[data-path="'+path+'"]').remove();
+
+            removeCategoryID(catElement.attr('data-id'));
+        }
+
+        $('.categoryName').on('click', function() {
+            var categoryName = $(this).text();
+
+            if ($(this).hasClass('selected')) {
+                //remove from list
+                removeCategory($(this));
+            } else {
+                //add to list
+                addCategory($(this));
+            }
+
+            $(this).toggleClass('selected');
+        });
+    });
+</script>
 {% endblock %}
