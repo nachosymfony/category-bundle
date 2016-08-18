@@ -19,17 +19,17 @@
                 <div id="jstree_category_tree">
                     <ul>
                         {% for name, data in hierarchy %}
-                        <li data-jstree='{ "type" : "folder", "category_id": {{ data.category.id }} }'>
+                        <li data-jstree='{ "type" : "folder", "category_id": {{ data.category.id }}, "category_name": "{{ data.category.name }}" }'>
                             {{ name }}
                             {% if data.children | length > 0 %}
                             <ul>
                             {% for name, data in data.children %}
-                            <li data-jstree='{ "type" : "folder", "category_id": {{ data.category.id }} }'>
+                            <li data-jstree='{ "type" : "folder", "category_id": {{ data.category.id }}, "category_name": "{{ data.category.name }}" }'>
                                 {{ name }}
                                 {% if data.children | length > 0 %}
                                     <ul>
                                         {% for name, data in data.children %}
-                                        <li data-jstree='{ "type" : "folder", "category_id": {{ data.category.id }} }'>{{ name }}</li>
+                                        <li data-jstree='{ "type" : "folder", "category_id": {{ data.category.id }}, "category_name": "{{ data.category.name }}" }'>{{ name }}</li>
                                         {% endfor %}
                                     </ul>
                                 {% endif %}

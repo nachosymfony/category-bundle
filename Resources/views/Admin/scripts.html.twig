@@ -1,0 +1,195 @@
+<script>
+    $(function() {
+        var selectedNode = null;
+
+        var jstreeElement = $('#jstree_category_tree');
+
+        function startLoading() {
+            {% if modal is defined %}
+            $('.mloading').css('opacity', 1);
+            {% else %}
+            nacholibre_admin.startLoading();
+            {% endif %}
+        }
+
+        function stopLoading() {
+            {% if modal is defined %}
+            $('.mloading').css('opacity', 0);
+            {% else %}
+            nacholibre_admin.stopLoading();
+            {% endif %}
+        }
+
+        jstreeElement.on('move_node.jstree', function (e, data) {
+            var element = data.instance.element;
+            var nodeData = data.node.data.jstree;
+
+            var categoryID = nodeData.category_id;
+            var position = data.position;
+            var oldPosition = data.old_position;
+
+            //same parents only position changed
+            if (data.old_parent == data.parent) {
+                // ako se mesti nadolu, dobavqme 1 kum poziciqta, zashtoto novata poziciq e realno s edna po malko, zashtoto
+                // vsichki elementi nad premesteniq sa se vdignali
+                if (position > oldPosition) {
+                    position += 1;
+                }
+
+                startLoading();
+                $.get(Routing.generate('nacholibre.category.admin.change_position', { id: categoryID, "position": position, "type": '{{ type }}' }), function(data) {
+                    stopLoading();
+                });
+                } else {
+                //change parent
+                if (data.parent == '#') {
+                    var newParentID = 0;
+                    } else {
+                    var newParent = $('#' + data.parent).attr('data-jstree');
+                    var newParentID = JSON.parse(newParent).category_id;
+                }
+
+                // elementa e vzet ot sub direktoriq i e dobaven v root, zatova uvelichavame s 1
+                if (data.old_parent != '#' && data.parent == '#') {
+                    var oldParentPosition = data.old_parent.split('_')[1];
+
+                    // ako se mesti nadolu, dobavqme 1 kum poziciqta, zashtoto novata poziciq e realno s edna po malko, zashtoto
+                    // vsichki elementi nad premesteniq sa se vdignali
+                    if (position > oldParentPosition) {
+                        position += 1;
+                    }
+                }
+
+                startLoading();
+                $.get(Routing.generate('nacholibre.category.admin.change_parent', { id: categoryID, "newParent": newParentID, "position": position, "type": '{{ type }}' }), function(data) {
+                    stopLoading();
+                });
+            }
+
+            console.log(data);
+        })
+        .on('changed.jstree', function (e, data) {
+            var i, j, r = [];
+
+            var action = data.action;
+
+            switch(action) {
+                case "select_node":
+                var selectedCategoryID = data.node.data.jstree.category_id;
+                loadEditForm(selectedCategoryID, data.node);
+                selectedNode = data.node;
+                //console.log(data);
+                //console.log(selectedCategoryID);
+                break;
+            }
+
+            //var selectedCategoryID = data.node.data.jstree.category_id;
+            //console.log(selectedCategoryID);
+
+            //console.log(data);
+            //for(i = 0, j = data.selected.length; i < j; i++) {
+                //    r.push(data.instance.get_node(data.selected[i]).text);
+                //}
+
+            //$('#event_result').html('Selected: ' + r.join(', '));
+        })
+        .jstree({
+            "core" : {
+                "check_callback": true,
+                //"check_callback" : function(operation, node, node_parent, node_position, more) {
+                    //    //operation can be 'create_node', 'rename_node', 'delete_node', 'move_node' or 'copy_node'
+                    //}
+            },
+            "types" : {
+                "#" : {
+                    "max_children" : 200,
+                    "max_depth" : {{ max_levels }},
+                    "valid_children" : ["folder"]
+                },
+                //"root" : {
+                    //    "icon" : "fa fa-tree",
+                    //    "valid_children" : ["folder"]
+                    //},
+                "folder" : {
+                    "icon" : "{{ asset('bundles/nacholibrecategory/img/folder.png') }}",
+                    "valid_children" : ["folder"]
+                }
+            },
+            "plugins" : [
+            "dnd", "search",
+            "state", "types", "wholerow", "unique"
+            ],
+        });
+
+        $('#create_category').on('click', function() {
+            var newCategoryUrl = Routing.generate('nacholibre.category.admin.new_ajax', {'type': '{{ type }}' });
+
+            startLoading();
+
+            $.get(newCategoryUrl, function(res) {
+                var li_attrs = { 'data-jstree': '{"type": "folder", "category_id": ' + res.category_id + '}' };
+                li_attrs = {};
+
+                var res = jstreeElement.jstree().create_node('#', {'text': res.name, 'type': 'folder', 'category_id': res.category_id, "li_attr": li_attrs, "data": {"jstree": {category_id: res.category_id}}}, 'last', function() {
+                    stopLoading();
+                });
+            });
+        });
+
+        function handleAjaxForm(html, editCategoryPath, node) {
+            var form = $(html).find('form[name=category]');
+            $('#edit_form_html').html(form);
+
+            form.attr('action', editCategoryPath);
+
+            return form;
+        }
+
+        function attachAjaxFormSubmitEvent(form, editCategoryPath, node) {
+            form.find('.deleteCategory').on('click', function(event) {
+                var link = $(this).attr('data-href');
+                $.get(link, function() {
+                    jstreeElement.jstree().delete_node(node);
+                    $('#edit_form_html').html('');
+                });
+            });
+
+            form.on('submit', function(e) {
+                e.preventDefault();
+
+                startLoading();
+
+                $.ajax({
+                    url : form.attr('action'),
+                    type: form.attr('method'),
+                    data : form.serialize(),
+                    success: function(html) {
+                        var form = handleAjaxForm(html, editCategoryPath, node);
+                        attachAjaxFormSubmitEvent(form, editCategoryPath, node);
+
+                        var categoryName = form.find('#category_name').val();
+
+                        var hasErrors = form.find('.help-block').length > 0;
+                        if (!hasErrors) {
+                            jstreeElement.jstree('rename_node', node, categoryName);
+                        }
+
+                        stopLoading();
+                    }
+                });
+            });
+        }
+
+        function loadEditForm(category_id, node) {
+            startLoading();
+
+            var editCategoryPath = Routing.generate('nacholibre.category.admin.edit', {id: category_id, 'type': '{{ type }}' });
+            $.get(editCategoryPath, function(data) {
+                var form = handleAjaxForm(data, editCategoryPath, node);
+                attachAjaxFormSubmitEvent(form, editCategoryPath, node);
+
+                stopLoading();
+            });
+        }
+    });
+</script>

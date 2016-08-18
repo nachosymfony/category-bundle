@@ -9,7 +9,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 use nacholibre\CategoryBundle\Form\CategoryType;
-
 use nacholibre\CategoryBundle\Entity\Category;
 
 /**
@@ -30,7 +29,30 @@ class CategoryController extends Controller {
             'hierarchy' => $hierarchy,
             'type' => $type,
             'max_levels' => $typeConfig['max_levels'],
-            //'allowAdd' => $allowAdd,
+        ]);
+    }
+
+    /**
+     * @Route("/members", name="nacholibre.category.admin.members")
+     */
+    public function getMembersAction($type, $id) {
+        $repo = $this->getCategoryRepo($type);
+        $em = $this->getDoctrine()->getManager();
+
+        $category = $repo->find(['id' => $id]);
+    }
+
+    public function _showCategoriesAction($type) {
+        $categoryManager = $this->get('nacholibre.category.manager');
+
+        $hierarchy = $categoryManager->getCategoryHierarchy($type);
+
+        $typeConfig = $categoryManager->getTypeConfig($type);
+
+        return $this->render('nacholibreCategoryBundle:Admin:_show_categories.html.twig', [
+            'hierarchy' => $hierarchy,
+            'type' => $type,
+            'max_levels' => $typeConfig['max_levels'],
         ]);
     }
 
@@ -130,7 +152,7 @@ class CategoryController extends Controller {
             return $this->redirectToRoute('nacholibre.category.admin.index', ['type' => $type]);
         }
 
-        return $this->render('nacholibreAdminBundle:misc:_add_edit.html.twig', [
+        return $this->render('nacholibreCategoryBundle:Admin:_add_edit.html.twig', [
             'form' => $form->createView(),
             'headerTitle' => 'Add Category',
         ]);
@@ -167,28 +189,29 @@ class CategoryController extends Controller {
             return $this->redirectToRoute('nacholibre.category.admin.edit', array('id' => $category->getId(), 'type' => $type) );
         }
 
-        return $this->render('nacholibreAdminBundle:misc:_add_edit.html.twig', [
+        return $this->render('nacholibreCategoryBundle:Admin:_add_edit.html.twig', [
             'form' => $form->createView(),
             'headerTitle' => 'Edit Category',
+            'members' => $category->getMembers(),
+            'children' => $category->getChildren(),
+            'category' => $category,
+            'type' => $type,
         ]);
     }
 
-    ///**
-    // * @Route("/delete/{id}", name="nacholibre.info_page.admin.delete")
-    // */
-    //public function deleteAction($id) {
-    //    $pagesManager = $this->get('nacholibre.pages.manager');
-    //    $repo = $pagesManager->getRepo();
-    //    $page = $repo->find($id);
+    /**
+     * @Route("/delete/{id}", name="nacholibre.category.admin.delete")
+     */
+    public function deleteAction($type, $id) {
+        $repo = $this->getCategoryRepo($type);
+        $category = $repo->find(['id' => $id]);
 
-    //    if ($page->getStatic()) {
-    //        return $this->redirectToRoute('admin.info_page');
-    //    }
+        $em = $this->getDoctrine()->getManager();
+        if (count($category->getMembers()) == 0) {
+            $em->remove($category);
+            $em->flush();
+        }
 
-    //    $em = $this->getDoctrine()->getManager();
-    //    $em->remove($page);
-    //    $em->flush();
-
-    //    return $this->redirectToRoute('nacholibre.info_page.admin.index');
-    //}
+        return new JsonResponse(['status' => 'ok']);
+    }
 }

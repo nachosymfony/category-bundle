@@ -1,0 +1,26 @@
+{% extends "nacholibreAdminBundle::layout.html.twig" %}
+
+{% block pageHeaderTitle headerTitle | trans %}
+
+{% block content %}
+{{ parent() }}
+<div class="row">
+    <div class='col-md-12 col-lg-8'>
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <hr>
+        <div class='row'>
+            <div class='col-md-4 text-left'>
+                <input type="submit" value="{{ 'Save' | trans }}" class="btn btn-default btn-primary" />
+            </div>
+            <div class='col-md-8 text-right'>
+                {% if members | length %}
+                <a href='#' target='_blank' class='btn btn-default'>{{ 'view' | trans }} {{ members | length }} {{ 'elements' | trans }}</a>
+                {% endif %}
+                <a data-href='{{ path('nacholibre.category.admin.delete', {id: category.id, type: type}) }}' class='btn btn-danger deleteCategory' {% if members | length > 0 or children | length > 0 %}disabled{% endif %}>{{ 'delete' | trans }}</a>
+            </div>
+        </div>
+    {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

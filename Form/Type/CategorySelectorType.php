@@ -8,6 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormError;
 use Ivory\CKEditorBundle\Form\Type\CKEditorType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -39,6 +40,8 @@ class CategorySelectorType extends AbstractType {
         $data = $categoryManager->getCategoryHierarchy($type);
 
         $view->vars['categories'] = $data;
+        $view->vars['category_max_levels'] = $config['max_levels'];
+        $view->vars['category_type'] = $type;
 
         //$entityClass = $config['entity_class'];
 
@@ -83,6 +86,7 @@ class CategorySelectorType extends AbstractType {
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $em = $this->em;
         $type = $options['mapping'];
+        $translator = $this->container->get('translator');
 
         $catConfig = $this->container->getParameter('nacholibre_category');
         $config = $catConfig['types'][$type];
@@ -94,11 +98,6 @@ class CategorySelectorType extends AbstractType {
                 if (!$categoriesAsText) {
                     return null;
                 }
-
-                //if ($options['multiple'] == false) {
-                //    $file = $filesAsText;
-                //    return $file->getID();
-                //}
 
                 $newCats = [];
                 foreach($categoriesAsText as $cat) {
@@ -113,28 +112,19 @@ class CategorySelectorType extends AbstractType {
                 $categories = $repo->findById($ids);
 
                 return $categories;
-
-                //if ($options['multiple'] == false) {
-                //    if (count($files) > 0) {
-                //        return $files[0];
-                //    } else {
-                //        return null;
-                //    }
-                //}
-
-                //return $files;
             }
         ));
-        //$parameters = $this->container->getParameter('nacholibre_pages');
-        //$editor = $parameters['editor'];
-        //$categoryManager = $this->container->get('nacholibre.category.manager');
 
-        //$formCategories = $categoryManager->generateFormFlatArrayCategories();
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) use($options, $translator) {
+            $form = $event->getForm();
 
-        //$builder->add('name', TextType::class, [
-        //    'label' => 'category.name',
-        //    'required' => true,
-        //]);
+            $data = $event->getForm()->getData();
+
+            if ($options['required'] && !$data) {
+                $event->getForm()->addError(new FormError($translator->trans('field_required')));
+                return;
+            }
+        });
     }
 
     /**
@@ -143,6 +133,8 @@ class CategorySelectorType extends AbstractType {
     public function configureOptions(OptionsResolver $resolver) {
         $resolver->setDefaults([
             'mapping' => null,
+            'required' => false,
+            'error_bubbling' => false,
         ]);
     }
 
