@@ -1,7 +1,7 @@
 {% import 'nacholibreAdminBundle::macros.html.twig' as macros %}
 
 {#
-<a href="{{ path('nacholibre.category.admin.new') }}" class='btn btn-primary btn-lg'>{{ 'Create' | trans }}</a>
+<a href="{{ path('nacholibre.category.admin.new') }}" class='btn btn-primary btn-lg'>{{ 'create' | trans }}</a>
 <hr>
 #}
 <div class='row'>
@@ -11,9 +11,9 @@
             <div class="panel-heading">Категории</div>
             #}
             <div class="panel-body">
-                <button class='btn btn-default btn-primary' type='button' id='create_category'>{{ 'Create' | trans }}</button>
+                <button class='btn btn-default btn-primary' type='button' id='create_category'>{{ 'create' | trans }}</button>
                 {#
-                <button class='btn btn-default btn-primary' type='button' id='edit_category' disabled>{{ 'Edit' | trans }}</button>
+                <button class='btn btn-default btn-primary' type='button' id='edit_category' disabled>{{ 'edit' | trans }}</button>
                 #}
                 <hr>
                 <div id="jstree_category_tree">
