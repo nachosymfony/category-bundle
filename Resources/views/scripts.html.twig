@@ -193,7 +193,7 @@
             removeCategoryID(catElement.attr('data-id'));
         }
 
-        $('.categoryName').on('click', function() {
+        $(document).on('click', '.categoryName', function() {
             var categoryName = $(this).text();
 
             if ($(this).hasClass('selected')) {
