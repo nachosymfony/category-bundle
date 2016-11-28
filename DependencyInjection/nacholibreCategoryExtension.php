@@ -39,7 +39,7 @@ class nacholibreCategoryExtension extends Extension implements PrependExtensionI
                 case 'twig':
                     $container->prependExtensionConfig(
                         $name,
-                        array('form' => array('resources' => array($this->formTypeTemplate)))
+                        ['form_themes' => [$this->formTypeTemplate]]
                     );
                     break;
             }
