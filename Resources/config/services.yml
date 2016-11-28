@@ -1,11 +1,11 @@
 services:
     nacholibre.category.manager:
         class: nacholibre\CategoryBundle\Model\CategoryManager
-        arguments: [@service_container, @doctrine.orm.entity_manager]
+        arguments: ["@service_container", "@doctrine.orm.entity_manager"]
 
     nacholibre.base_category.form.type:
         class: nacholibre\CategoryBundle\Form\BaseCategoryType
-        arguments: [@service_container]
+        arguments: ["@service_container"]
         tags:
             - { name: form.type }
 
